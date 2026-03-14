@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { OperationsService } from './operations.service';
 import { AuthRequest } from '../../shared/middleware/auth.middleware';
 import { z } from 'zod';
+import { paramStr } from '../../shared/utils';
 
 const createOperationSchema = z.object({
   type: z.enum(['receipt', 'delivery', 'transfer', 'adjustment']),
@@ -44,7 +45,7 @@ export class OperationsController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const operation = await OperationsService.getById(req.params.id);
+      const operation = await OperationsService.getById(paramStr(req.params.id));
       if (!operation) return res.status(404).json({ success: false, error: { message: 'Operation not found' } });
       res.json({ success: true, data: operation });
     } catch (err: any) {
@@ -66,7 +67,7 @@ export class OperationsController {
   static async update(req: Request, res: Response) {
     try {
       const data = updateOperationSchema.parse(req.body);
-      const operation = await OperationsService.update(req.params.id, data);
+      const operation = await OperationsService.update(paramStr(req.params.id), data);
       res.json({ success: true, data: operation });
     } catch (err: any) {
       const status = err.message.includes('OPERATION_LOCKED') ? 409 : err.message === 'Operation not found' ? 404 : 400;
@@ -76,7 +77,7 @@ export class OperationsController {
 
   static async submit(req: Request, res: Response) {
     try {
-      const operation = await OperationsService.submit(req.params.id);
+      const operation = await OperationsService.submit(paramStr(req.params.id));
       res.json({ success: true, data: operation });
     } catch (err: any) {
       const status = err.message.includes('OPERATION_LOCKED') ? 409 : 404;
@@ -86,7 +87,7 @@ export class OperationsController {
 
   static async markReady(req: Request, res: Response) {
     try {
-      const operation = await OperationsService.markReady(req.params.id);
+      const operation = await OperationsService.markReady(paramStr(req.params.id));
       res.json({ success: true, data: operation });
     } catch (err: any) {
       const status = err.message.includes('OPERATION_LOCKED') ? 409 : 404;
@@ -96,7 +97,7 @@ export class OperationsController {
 
   static async cancel(req: AuthRequest, res: Response) {
     try {
-      const operation = await OperationsService.cancel(req.params.id, req.user!.role);
+      const operation = await OperationsService.cancel(paramStr(req.params.id), req.user!.role);
       res.json({ success: true, data: operation });
     } catch (err: any) {
       const status = err.message.includes('FORBIDDEN') ? 403 : err.message.includes('OPERATION_LOCKED') ? 409 : 404;
@@ -106,7 +107,7 @@ export class OperationsController {
 
   static async validate(req: AuthRequest, res: Response) {
     try {
-      const operation = await OperationsService.validate(req.params.id, req.user!.userId);
+      const operation = await OperationsService.validate(paramStr(req.params.id), req.user!.userId);
       res.json({ success: true, data: operation });
     } catch (err: any) {
       let status = 500;

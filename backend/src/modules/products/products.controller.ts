@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ProductsService } from './products.service';
 import { z } from 'zod';
+import { paramStr } from '../../shared/utils';
 
 const createProductSchema = z.object({
   name: z.string().min(1),
@@ -38,7 +39,7 @@ export class ProductsController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const product = await ProductsService.getById(req.params.id);
+      const product = await ProductsService.getById(paramStr(req.params.id));
       if (!product) return res.status(404).json({ success: false, error: { message: 'Product not found' } });
       res.json({ success: true, data: product });
     } catch (err: any) {
@@ -71,7 +72,7 @@ export class ProductsController {
   static async update(req: Request, res: Response) {
     try {
       const data = updateProductSchema.parse(req.body);
-      const product = await ProductsService.update(req.params.id, data);
+      const product = await ProductsService.update(paramStr(req.params.id), data);
       res.json({ success: true, data: product });
     } catch (err: any) {
       const status = err.message === 'Product not found' ? 404 : 400;
@@ -81,7 +82,7 @@ export class ProductsController {
 
   static async delete(req: Request, res: Response) {
     try {
-      await ProductsService.softDelete(req.params.id);
+      await ProductsService.softDelete(paramStr(req.params.id));
       res.json({ success: true, data: { deleted: true } });
     } catch (err: any) {
       res.status(404).json({ success: false, error: { message: err.message } });
