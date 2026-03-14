@@ -1,15 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
+import { useBackendStore } from '../store/backend';
+const isOfflineOrMock = () => { const s = useBackendStore.getState(); return s.isMockMode || !s.isOnline; };
 import { Operation, ApiResponse, OperationStatus } from '../types';
 import { MOCK_OPERATIONS } from '../lib/mocks/operations';
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 export function useOperations(filters?: Record<string, string>) {
   return useQuery({
     queryKey: ['operations', filters],
     queryFn: async (): Promise<ApiResponse<Operation[]>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) =>
           setTimeout(() => {
             let filtered = [...MOCK_OPERATIONS];
@@ -44,7 +45,7 @@ export function useOperation(id: string) {
   return useQuery({
     queryKey: ['operations', id],
     queryFn: async (): Promise<ApiResponse<Operation>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve, reject) =>
           setTimeout(() => {
             const op = MOCK_OPERATIONS.find(o => o.id === id);
@@ -64,7 +65,7 @@ export function useCreateOperation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: Partial<Operation>) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(() => resolve({ success: true, data: { ...data, id: 'op-new', status: 'draft' } }), 800));
       }
       const res = await api.post('/operations', data);
@@ -80,7 +81,7 @@ export function useUpdateOperation(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: Partial<Operation>) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(() => resolve({ success: true, data: { ...data, id } }), 800));
       }
       const res = await api.put(`/operations/${id}`, data);
@@ -99,7 +100,7 @@ const createTransitionMutation = (action: string, targetStatus: OperationStatus)
     const queryClient = useQueryClient();
     return useMutation({
       mutationFn: async (payload?: Record<string, unknown>) => {
-        if (USE_MOCKS) {
+        if (isOfflineOrMock()) {
           return new Promise((resolve) => setTimeout(() => resolve({ success: true, data: { id, status: targetStatus } }), 800));
         }
         const res = await api.post(`/operations/${id}/${action}`, payload);

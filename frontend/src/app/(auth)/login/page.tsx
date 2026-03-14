@@ -22,7 +22,8 @@ export default function LoginPage() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res = await login.mutateAsync({ email, password }) as any;
       if (res?.data?.data) {
-        setAuth(res.data.data.access_token, res.data.data.user);
+        const token = res.data.data.accessToken || res.data.data.access_token;
+        setAuth(token, res.data.data.user);
         router.push('/dashboard');
       }
     } catch (err) {

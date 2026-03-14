@@ -1,0 +1,89 @@
+-- Clear existing mock data except the admin user
+DELETE FROM operation_lines;
+DELETE FROM operations;
+DELETE FROM stock_ledger;
+DELETE FROM stock_balances;
+DELETE FROM products;
+DELETE FROM locations;
+DELETE FROM warehouses;
+-- don't delete users, or insert new ones if they don't exist
+
+-- Add extra users
+INSERT INTO users (id, name, email, password_hash, role) VALUES 
+('00000000-0000-0000-0000-000000000001', 'Admin', 'admin@example.com', '$2b$10$fsSX0a0frZOyiHXDubzMGuzoYD/zP1QpBWV4T2HlxyXPCjhnsylKe', 'manager') ON CONFLICT DO NOTHING;
+INSERT INTO users (id, name, email, password_hash, role) VALUES 
+('00000000-0000-0000-0000-000000001001', 'John Staff', 'john@example.com', '$2b$10$fsSX0a0frZOyiHXDubzMGuzoYD/zP1QpBWV4T2HlxyXPCjhnsylKe', 'staff') ON CONFLICT DO NOTHING;
+INSERT INTO users (id, name, email, password_hash, role) VALUES 
+('00000000-0000-0000-0000-000000001002', 'Sarah Manager', 'sarah@example.com', '$2b$10$fsSX0a0frZOyiHXDubzMGuzoYD/zP1QpBWV4T2HlxyXPCjhnsylKe', 'manager') ON CONFLICT DO NOTHING;
+
+-- Warehouses
+INSERT INTO warehouses (id, name, address) VALUES 
+('11111111-1111-1111-1111-000000000001', 'Central Distribution Hub', '100 Main St, Chicago IL'),
+('11111111-1111-1111-1111-000000000002', 'West Coast Fulfillment', '500 Tech Ave, San Jose CA'),
+('11111111-1111-1111-1111-000000000003', 'Europe Regional Center', '10 Berlin Way, Berlin, DE')
+ON CONFLICT DO NOTHING;
+
+-- Locations
+INSERT INTO locations (id, warehouse_id, name) VALUES 
+('22222222-2222-2222-2222-000000000001', '11111111-1111-1111-1111-000000000001', 'Zone A - Receiving'),
+('22222222-2222-2222-2222-000000000002', '11111111-1111-1111-1111-000000000001', 'Zone B - Bulk Storage'),
+('22222222-2222-2222-2222-000000000003', '11111111-1111-1111-1111-000000000001', 'Zone C - Picking'),
+('22222222-2222-2222-2222-000000000004', '11111111-1111-1111-1111-000000000002', 'West - Aisle 1'),
+('22222222-2222-2222-2222-000000000005', '11111111-1111-1111-1111-000000000002', 'West - Aisle 2'),
+('22222222-2222-2222-2222-000000000006', '11111111-1111-1111-1111-000000000003', 'EU - Primary Storage')
+ON CONFLICT DO NOTHING;
+
+-- Products
+INSERT INTO products (id, name, sku, category, unit_of_measure, minimum_stock, reorder_quantity) VALUES 
+('33333333-3333-3333-3333-000000000001', 'Quantum X1 Laptop', 'TECH-LP-01', 'Electronics', 'pcs', 10, 50),
+('33333333-3333-3333-3333-000000000002', 'Hyperion Desktop PC', 'TECH-DSK-02', 'Electronics', 'pcs', 5, 20),
+('33333333-3333-3333-3333-000000000003', 'ErgoPro Office Chair', 'FURN-CHR-01', 'Furniture', 'pcs', 20, 100),
+('33333333-3333-3333-3333-000000000004', 'Lumina Standing Desk', 'FURN-DSK-02', 'Furniture', 'pcs', 15, 30),
+('33333333-3333-3333-3333-000000000005', 'Steel Construction Beams', 'MAT-STL-01', 'Raw Material', 'ton', 50, 200),
+('33333333-3333-3333-3333-000000000006', 'Industrial Copper Wire', 'MAT-COP-02', 'Raw Material', 'roll', 100, 500),
+('33333333-3333-3333-3333-000000000007', 'NextGen Noise Cancel Headphones', 'TECH-AUD-03', 'Electronics', 'pcs', 50, 100),
+('33333333-3333-3333-3333-000000000008', '4K UltraHD Monitor - 32"', 'TECH-MON-04', 'Electronics', 'pcs', 20, 50),
+('33333333-3333-3333-3333-000000000009', 'Aero Mesh Chair', 'FURN-CHR-05', 'Furniture', 'pcs', 15, 40),
+('33333333-3333-3333-3333-000000000010', 'Aluminum Extrusion Bar', 'MAT-ALU-03', 'Raw Material', 'meter', 500, 2000),
+('33333333-3333-3333-3333-000000000011', 'VR Headset Pro', 'TECH-VR-05', 'Electronics', 'pcs', 10, 30),
+('33333333-3333-3333-3333-000000000012', 'Conference Table (Oak)', 'FURN-TBL-06', 'Furniture', 'pcs', 2, 5)
+ON CONFLICT DO NOTHING;
+
+-- Setup initial stock using stock_balances direct insert for mock speed 
+-- (in real life, needs to go through operations/ledger)
+INSERT INTO stock_balances (product_id, location_id, quantity) VALUES 
+('33333333-3333-3333-3333-000000000001', '22222222-2222-2222-2222-000000000002', 145),
+('33333333-3333-3333-3333-000000000002', '22222222-2222-2222-2222-000000000002', 42),
+('33333333-3333-3333-3333-000000000003', '22222222-2222-2222-2222-000000000004', 312),
+('33333333-3333-3333-3333-000000000004', '22222222-2222-2222-2222-000000000004', 8),  -- LOW STOCK
+('33333333-3333-3333-3333-000000000005', '22222222-2222-2222-2222-000000000006', 15), -- LOW STOCK
+('33333333-3333-3333-3333-000000000006', '22222222-2222-2222-2222-000000000006', 840),
+('33333333-3333-3333-3333-000000000007', '22222222-2222-2222-2222-000000000002', 200),
+('33333333-3333-3333-3333-000000000008', '22222222-2222-2222-2222-000000000002', 65),
+('33333333-3333-3333-3333-000000000009', '22222222-2222-2222-2222-000000000004', 4),  -- LOW STOCK
+('33333333-3333-3333-3333-000000000010', '22222222-2222-2222-2222-000000000006', 4200),
+('33333333-3333-3333-3333-000000000011', '22222222-2222-2222-2222-000000000002', 0),  -- OUT OF STOCK
+('33333333-3333-3333-3333-000000000012', '22222222-2222-2222-2222-000000000004', 0)   -- OUT OF STOCK
+ON CONFLICT (product_id, location_id) DO UPDATE SET quantity = EXCLUDED.quantity;
+
+-- Create some dummy operations
+INSERT INTO operations (id, type, status, source_location_id, dest_location_id, created_by, notes) VALUES 
+('44444444-4444-4444-4444-000000000001', 'receipt', 'waiting', NULL, '22222222-2222-2222-2222-000000000001', '00000000-0000-0000-0000-000000000001', 'Incoming from Supplier A'),
+('44444444-4444-4444-4444-000000000002', 'delivery', 'ready', '22222222-2222-2222-2222-000000000002', NULL, '00000000-0000-0000-0000-000000000001', 'Express Delivery for VIP Client'),
+('44444444-4444-4444-4444-000000000003', 'transfer', 'waiting', '22222222-2222-2222-2222-000000000002', '22222222-2222-2222-2222-000000000004', '00000000-0000-0000-0000-000000001001', 'Rebalancing stock for West Coast'),
+('44444444-4444-4444-4444-000000000004', 'receipt', 'draft', NULL, '22222222-2222-2222-2222-000000000006', '00000000-0000-0000-0000-000000001002', 'Monthly EU Materials Intake');
+
+-- Operation Lines
+INSERT INTO operation_lines (id, operation_id, product_id, expected_qty, done_qty) VALUES
+-- Receipt 1
+(gen_random_uuid(), '44444444-4444-4444-4444-000000000001', '33333333-3333-3333-3333-000000000001', 50, 0),
+(gen_random_uuid(), '44444444-4444-4444-4444-000000000001', '33333333-3333-3333-3333-000000000007', 100, 0),
+-- Delivery 2
+(gen_random_uuid(), '44444444-4444-4444-4444-000000000002', '33333333-3333-3333-3333-000000000002', 5, 5),
+(gen_random_uuid(), '44444444-4444-4444-4444-000000000002', '33333333-3333-3333-3333-000000000008', 2, 2),
+-- Transfer 3
+(gen_random_uuid(), '44444444-4444-4444-4444-000000000003', '33333333-3333-3333-3333-000000000001', 20, 0),
+-- Receipt 4
+(gen_random_uuid(), '44444444-4444-4444-4444-000000000004', '33333333-3333-3333-3333-000000000005', 200, 0);
+
+-- Trigger refresh material views if any exist (none currently)

@@ -20,9 +20,18 @@ export const logger = winston.createLogger({
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(compression());
 app.use(express.json());
+
+// Request logger
+app.use((req: Request, res: Response, next: NextFunction) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
+});
 
 // Rate Limiter
 export const authLimiter = rateLimit({
@@ -31,12 +40,13 @@ export const authLimiter = rateLimit({
   message: { error: 'Too many auth requests, please try again later.' }
 });
 
-// Routes
-app.get('/health', (req: Request, res: Response) => {
-  // To strictly check if DB/Redis is up, we can do that here.
-  // We'll mock it for now since Docker isn't running yet.
+// Health Check
+const healthCheck = (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', db: 'connected', redis: 'connected' });
-});
+};
+
+app.get('/health', healthCheck);
+app.get('/v1/health', healthCheck);
 
 // Auth Routes
 import authRoutes from './modules/auth/auth.routes';

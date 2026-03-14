@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 @theme {
   --color-base: oklch(10% 0.010 250);
   --color-surface: oklch(13% 0.012 250);
@@ -63,32 +64,41 @@
   --shadow-lg: 0 8px 32px oklch(0% 0 0 / 0.6);
   --shadow-accent: 0 0 16px var(--color-accent-glow);
 
-  @keyframes shimmer {
-    100% { transform: translateX(100%); }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-  }
-
-  @keyframes pulse-subtle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-
-  @keyframes slide-in-right {
-    from { transform: translateX(20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  .animate-float { animation: float 3s ease-in-out infinite; }
-  .animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out infinite; }
-  .animate-slide-in-right { animation: slide-in-right 0.4s var(--ease-spring); }
 }
+
+@utility animate-float { animation: float 3s ease-in-out infinite; }
+@utility animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out infinite; }
+@utility animate-slide-in-right { animation: slide-in-right 0.4s var(--ease-spring); }
+@utility animate-pulse-amber { animation: pulse-amber 2s ease-in-out infinite; }
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pulse-amber {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 4px var(--color-status-warning)); }
+  50% { opacity: 0.6; filter: drop-shadow(0 0 1px transparent); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
 
 @layer base {
   :root {
+    /* Base Variables (Default to Dark for this app as requested) */
     --bg-base: var(--color-base);
     --bg-surface: var(--color-surface);
     --bg-elevated: var(--color-elevated);
@@ -97,7 +107,13 @@
     --accent: var(--color-accent);
     --text-primary: var(--color-text-primary);
     --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
     --border-subtle: var(--color-border-subtle);
+    --border: var(--color-border);
+    --border-accent: var(--color-border-accent);
+
+    --status-warning: var(--color-status-waiting);
+    --status-danger: var(--color-status-danger);
 
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-in: cubic-bezier(0.0, 0.0, 0.2, 1.0);
@@ -105,9 +121,39 @@
     --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1.0);
   }
 
+  /* LIGHT THEME OVERRIDES */
+  [data-theme='light'],
+  .light {
+    --bg-base: oklch(98% 0.005 250);
+    --bg-surface: oklch(100% 0 0);
+    --bg-elevated: oklch(100% 0 0);
+    --bg-hover: oklch(96% 0.005 250);
+    
+    --text-primary: oklch(25% 0.01 250);
+    --text-secondary: oklch(45% 0.01 250);
+    --text-muted: oklch(60% 0.01 250);
+    --border-subtle: oklch(92% 0.01 250);
+    --border: oklch(85% 0.01 250);
+  }
+
+  /* DARK THEME (Explicit) */
+  [data-theme='dark'],
+  .dark {
+    --bg-base: var(--color-base);
+    --bg-surface: var(--color-surface);
+    --bg-elevated: var(--color-elevated);
+    --bg-hover: var(--color-hover);
+    
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --border-subtle: var(--color-border-subtle);
+    --border: var(--color-border);
+  }
+
   body {
-    background-color: var(--color-base);
-    color: var(--color-text-primary);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     font-family: var(--font-sans);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -123,5 +169,15 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-mono);
+  }
+
+  @media print {
+    body {
+      background-color: white !important;
+      color: black !important;
+    }
+    @page {
+      margin: 10mm;
+    }
   }
 }

@@ -105,8 +105,11 @@ export default function ProductDetailPage() {
         
         {/* Info Card */}
         <div className="md:col-span-2 space-y-6">
-          <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-sm">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider border-b border-[var(--border-subtle)] pb-4 mb-4">
+          <div className="relative overflow-hidden bg-[var(--bg-elevated)]/80 backdrop-blur-xl border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-md transition-all h-full">
+            {/* Subtle gradient glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-radial from-[var(--accent)]/10 to-transparent opacity-50 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+            <h2 className="relative z-10 text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-4 mb-4 drop-shadow-sm">
               Product Details
             </h2>
             
@@ -141,14 +144,17 @@ export default function ProductDetailPage() {
 
         {/* Location Stock Card */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] shadow-sm overflow-hidden flex flex-col h-full">
-            <div className="p-5 sm:p-6 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] flex justify-between items-center">
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">
+          <div className="relative bg-[var(--bg-elevated)]/80 backdrop-blur-xl border border-[var(--border-subtle)] rounded-[var(--radius-lg)] shadow-md overflow-hidden flex flex-col h-full transition-all">
+            {/* Subtle gradient glow */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-radial from-[var(--status-info)]/10 to-transparent opacity-50 blur-3xl rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+            
+            <div className="relative z-10 p-5 sm:p-6 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 flex justify-between items-center">
+              <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest drop-shadow-sm">
                 Stock by Location
               </h2>
             </div>
             
-            <div className="flex-1 p-0">
+            <div className="relative z-10 flex-1 p-0">
               {product.stock_by_location?.length === 0 ? (
                 <div className="p-6 text-center text-[var(--text-secondary)] text-sm">
                   No stock available in any location.
@@ -167,10 +173,10 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <div className="p-4 bg-[var(--bg-surface)] border-t border-[var(--border-subtle)]">
+            <div className="relative z-10 p-4 bg-[var(--bg-surface)]/50 border-t border-[var(--border-subtle)]">
               <button 
                 onClick={() => router.push(`/history?search=${product.sku}`)}
-                className="w-full flex items-center justify-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors py-2 rounded-[var(--radius-sm)] border border-[var(--border)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-hover)]"
+                className="w-full flex items-center justify-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-white transition-colors py-2 rounded-[var(--radius-sm)] border border-[var(--border)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-hover)]"
               >
                 <History className="w-4 h-4" /> View Move History
               </button>

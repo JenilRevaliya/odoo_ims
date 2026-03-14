@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/auth';
+import { useBackendStore } from '../store/backend';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
@@ -18,10 +19,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auto-refresh logic (401 catch)
+// Auto-refresh logic (401 catch) and offline detection
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    useBackendStore.getState().setOnlineStatus(true);
+    return response;
+  },
   async (error) => {
+    if (!error.response) {
+      // Network Error or server is down
+      useBackendStore.getState().setOnlineStatus(false);
+    } else {
+      useBackendStore.getState().setOnlineStatus(true);
+    }
+    
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

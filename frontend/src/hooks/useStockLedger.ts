@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
+import { useBackendStore } from '../store/backend';
+const isOfflineOrMock = () => { const s = useBackendStore.getState(); return s.isMockMode || !s.isOnline; };
 import { LedgerEntry, ApiResponse } from '../types';
 import { MOCK_LEDGER } from '../lib/mocks/ledger';
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 export function useStockLedger(filters?: Record<string, string>) {
   return useQuery({
     queryKey: ['stock-ledger', filters],
     queryFn: async (): Promise<ApiResponse<LedgerEntry[]>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) =>
           setTimeout(() => {
             let filtered = [...MOCK_LEDGER];

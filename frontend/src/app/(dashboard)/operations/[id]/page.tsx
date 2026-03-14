@@ -11,14 +11,16 @@ import {
   useCancelOperation
 } from '@/hooks/useOperations';
 import { useProfile } from '@/hooks/useProfile';
+import { useLocations } from '@/hooks/useWarehouses';
 import { toast } from '@/store/toast';
 import { 
-  ArrowLeft, History, Play, CheckCircle2, XCircle, FileText, Package, AlertTriangle, Loader2, Save
+  ArrowLeft, History, Play, CheckCircle2, XCircle, FileText, Package, AlertTriangle, Loader2, Save, Printer
 } from 'lucide-react';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import StatusBadge from '@/components/ui/StatusBadge';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import OperationReceipt from '@/components/ui/OperationReceipt';
 import { parseISO, format } from 'date-fns';
 
 export default function OperationDetailPage() {
@@ -44,6 +46,14 @@ export default function OperationDetailPage() {
 
   // Editable Quantities (local state, flushed to backend on blur or via explicit save)
   const [editedQuantities, setEditedQuantities] = useState<Record<string, number>>({});
+
+  const { data: locationsData } = useLocations();
+  const locations = locationsData?.data || [];
+  const getLocName = (id: string | null, fallback: string) => {
+    if (!id) return fallback;
+    const loc = locations.find(l => l.id === id);
+    return loc ? loc.name : id;
+  };
 
   if (isLoading) {
     return (
@@ -103,7 +113,9 @@ export default function OperationDetailPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <>
+    {/* Screen UI - Hidden when printing */}
+    <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-2 duration-300 print:hidden">
       
       <div className="flex items-center justify-between mb-2">
         <Breadcrumb customLabel={operation.reference_number || operation.id.split('-')[0]} />
@@ -177,6 +189,13 @@ export default function OperationDetailPage() {
             </button>
           )}
 
+          <button 
+            onClick={() => window.print()}
+            className="flex-1 md:flex-none flex justify-center items-center gap-2 px-4 py-2 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-hover)] text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-[var(--radius-md)] transition-colors"
+          >
+            <Printer className="w-4 h-4" /> Print PDF
+          </button>
+
           {isDone && (
             <button 
               onClick={() => router.push(`/history?operation_id=${operation.id}`)}
@@ -191,19 +210,26 @@ export default function OperationDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
         {/* Info Card */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 shadow-sm space-y-5 h-full">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider border-b border-[var(--border-subtle)] pb-2">
+          <div className="relative overflow-hidden bg-[var(--bg-elevated)]/80 backdrop-blur-xl border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 shadow-md space-y-5 h-full transition-all">
+            {/* Subtle gradient glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-radial from-[var(--accent)]/10 to-transparent opacity-50 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+            <h2 className="relative z-10 text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-2 drop-shadow-sm">
               Details
             </h2>
             
             <div>
               <dt className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">Source</dt>
-              <dd className="text-sm text-[var(--text-primary)]">{operation.source_location_id || 'Supplier / External'}</dd>
+              <dd className="text-sm text-[var(--text-primary)] font-medium">
+                {getLocName(operation.source_location_id, 'Supplier / External')}
+              </dd>
             </div>
             
             <div>
               <dt className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">Destination</dt>
-              <dd className="text-sm text-[var(--text-primary)]">{operation.dest_location_id || 'Customer / External'}</dd>
+              <dd className="text-sm text-[var(--text-primary)] font-medium">
+                {getLocName(operation.dest_location_id, 'Customer / External')}
+              </dd>
             </div>
 
             {operation.notes && (
@@ -224,9 +250,12 @@ export default function OperationDetailPage() {
 
         {/* Lines Card */}
         <div className="md:col-span-2 space-y-6">
-          <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] shadow-sm overflow-hidden h-full flex flex-col">
-            <div className="p-5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] flex justify-between items-center">
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+          <div className="relative overflow-hidden bg-[var(--bg-elevated)]/80 backdrop-blur-xl border border-[var(--border-subtle)] rounded-[var(--radius-lg)] shadow-md h-full flex flex-col transition-all">
+            {/* Subtle gradient glow */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-radial from-[var(--status-info)]/10 to-transparent opacity-50 blur-3xl rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+            <div className="relative z-10 p-5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 flex justify-between items-center">
+              <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-2 drop-shadow-sm">
                 <Package className="w-4 h-4 text-[var(--text-muted)]" /> Product Lines
               </h2>
               {isEditable && (
@@ -241,7 +270,7 @@ export default function OperationDetailPage() {
               )}
             </div>
             
-            <div className="flex-1 overflow-x-auto">
+            <div className="relative z-10 flex-1 overflow-x-auto">
               {operation.lines?.length === 0 ? (
                 <div className="p-8 text-center text-[var(--text-secondary)] text-sm flex flex-col items-center gap-2">
                   <FileText className="w-8 h-8 text-[var(--text-muted)]" />
@@ -330,5 +359,9 @@ export default function OperationDetailPage() {
         }}
       />
     </div>
+
+    {/* Print Template - Hidden on screen, visible when printing */}
+    <OperationReceipt operation={operation} />
+    </>
   );
 }

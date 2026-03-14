@@ -182,8 +182,11 @@ function OperationForm({ type, onBack }: { type: OperationType, onBack: () => vo
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Logistics Block */}
-        <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider border-b border-[var(--border-subtle)] pb-2 mb-4">
+        <div className="relative overflow-hidden bg-[var(--bg-elevated)]/80 backdrop-blur-xl border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-md transition-all">
+          {/* Subtle gradient glow */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-radial from-[var(--accent)]/10 to-transparent opacity-50 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+          
+          <h2 className="relative z-10 text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest border-b border-[var(--border-subtle)] pb-2 mb-4 drop-shadow-sm">
             Logistics Details
           </h2>
           
@@ -250,9 +253,12 @@ function OperationForm({ type, onBack }: { type: OperationType, onBack: () => vo
         </div>
 
         {/* Product Lines Block */}
-        <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-sm">
-          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-2 mb-4">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">
+        <div className="relative overflow-hidden bg-[var(--bg-elevated)]/80 backdrop-blur-xl border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 sm:p-6 shadow-md transition-all">
+          {/* Subtle gradient glow */}
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-radial from-[var(--status-info)]/10 to-transparent opacity-50 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+
+          <div className="relative z-10 flex items-center justify-between border-b border-[var(--border-subtle)] pb-2 mb-4">
+            <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest drop-shadow-sm">
               {isAdjustment ? 'Adjustment Details' : 'Product Lines'}
             </h2>
           </div>

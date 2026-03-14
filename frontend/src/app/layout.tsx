@@ -37,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmMono.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${dmMono.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`} suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
         <Providers>
           {children}

@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../lib/api';
+import { useBackendStore } from '../store/backend';
+const isOfflineOrMock = () => { const s = useBackendStore.getState(); return s.isMockMode || !s.isOnline; };
 import { DashboardKPIs, Product, Operation, ApiResponse } from '../types';
 import { MOCK_DASHBOARD_KPIS } from '../lib/mocks/dashboard';
 import { MOCK_PRODUCTS } from '../lib/mocks/products';
 import { MOCK_OPERATIONS } from '../lib/mocks/operations';
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 export function useDashboardKPIs(warehouseId?: string) {
   return useQuery({
     queryKey: ['dashboard', 'kpis', warehouseId],
     queryFn: async (): Promise<ApiResponse<DashboardKPIs>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) =>
           setTimeout(() => resolve({ success: true, data: MOCK_DASHBOARD_KPIS }), 600)
         );
@@ -28,7 +29,7 @@ export function useLowStock() {
   return useQuery({
     queryKey: ['dashboard', 'low-stock'],
     queryFn: async (): Promise<ApiResponse<Product[]>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) =>
           setTimeout(() => {
             const lowStock = MOCK_PRODUCTS.filter(p => p.total_stock > 0 && p.total_stock <= p.minimum_stock);
@@ -46,7 +47,7 @@ export function useRecentOperations() {
   return useQuery({
     queryKey: ['dashboard', 'recent-operations'],
     queryFn: async (): Promise<ApiResponse<Operation[]>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) =>
           setTimeout(() => {
             const sorted = [...MOCK_OPERATIONS].sort((a, b) => 

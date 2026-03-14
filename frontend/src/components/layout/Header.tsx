@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useProfile } from '@/hooks/useProfile';
 
 import { useUIStore } from '@/store/ui';
+import BackendStatusBadge from '@/components/ui/BackendStatusBadge';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const ROUTE_MAP: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -85,6 +87,8 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
+        <BackendStatusBadge />
+        <ThemeToggle />
         <button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-full transition-colors hidden sm:flex">
           <Search className="w-5 h-5" />
         </button>

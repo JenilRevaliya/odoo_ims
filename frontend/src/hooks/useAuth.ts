@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+import { useBackendStore } from '../store/backend';
+const isOfflineOrMock = () => { const s = useBackendStore.getState(); return s.isMockMode || !s.isOnline; };
 
 export function useAuth() {
   const queryClient = useQueryClient();
 
   const login = useMutation({
     mutationFn: async (credentials: Record<string, string>) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) =>
           setTimeout(() => {
             resolve({
@@ -28,7 +29,7 @@ export function useAuth() {
 
   const signup = useMutation({
     mutationFn: async (userData: Record<string, string>) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(resolve, 800));
       }
       return api.post('/auth/signup', userData);
@@ -37,7 +38,7 @@ export function useAuth() {
 
   const logout = useMutation({
     mutationFn: async () => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(resolve, 300));
       }
       return api.post('/auth/logout');
@@ -49,7 +50,7 @@ export function useAuth() {
 
   const forgotPassword = useMutation({
     mutationFn: async (email: string) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(resolve, 800));
       }
       return api.post('/auth/forgot-password', { email });
@@ -58,7 +59,7 @@ export function useAuth() {
 
   const resetPassword = useMutation({
     mutationFn: async (data: Record<string, string>) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(resolve, 800));
       }
       return api.post('/auth/reset-password', data);

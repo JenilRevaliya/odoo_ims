@@ -1,14 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
+import { useBackendStore } from '../store/backend';
+const isOfflineOrMock = () => { const s = useBackendStore.getState(); return s.isMockMode || !s.isOnline; };
 import { User, ApiResponse } from '../types';
 
-const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 export function useProfile() {
   return useQuery({
     queryKey: ['profile'],
     queryFn: async (): Promise<ApiResponse<User>> => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         // Simulating current user based on token (assuming 1 for mock)
         return new Promise((resolve) => setTimeout(() => resolve({
           success: true,
@@ -31,7 +32,7 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: Record<string, string>) => {
-      if (USE_MOCKS) {
+      if (isOfflineOrMock()) {
         return new Promise((resolve) => setTimeout(() => resolve({ success: true, data }), 800));
       }
       const res = await api.put('/profile', data);
