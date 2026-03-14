@@ -29,6 +29,8 @@ export const metadata: Metadata = {
   description: 'Enterprise warehouse operations tool',
 };
 
+import ToastContainer from '@/components/ui/ToastContainer';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,6 +41,7 @@ export default function RootLayout({
       <body className="antialiased min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
         <Providers>
           {children}
+          <ToastContainer />
         </Providers>
       </body>
     </html>

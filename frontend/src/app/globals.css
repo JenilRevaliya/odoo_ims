@@ -62,6 +62,29 @@
   --shadow-md: 0 4px 12px oklch(0% 0 0 / 0.5);
   --shadow-lg: 0 8px 32px oklch(0% 0 0 / 0.6);
   --shadow-accent: 0 0 16px var(--color-accent-glow);
+
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out infinite; }
+  .animate-slide-in-right { animation: slide-in-right 0.4s var(--ease-spring); }
 }
 
 @layer base {

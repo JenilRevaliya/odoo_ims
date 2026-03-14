@@ -2,18 +2,33 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Hexagon, Eye, EyeOff } from 'lucide-react';
+import { Hexagon, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuth();
+  const setAuth = useAuthStore(state => state.setAuth);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: integrate API
-    router.push('/dashboard');
+    setError(null);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res = await login.mutateAsync({ email, password }) as any;
+      if (res?.data?.data) {
+        setAuth(res.data.data.access_token, res.data.data.user);
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setError((err as any)?.response?.data?.error?.message || 'Invalid credentials');
+    }
   };
 
   return (
@@ -59,17 +74,28 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {error && (
+            <div className="bg-[var(--status-danger)]/10 text-[var(--status-danger)] px-4 py-3 rounded-[var(--radius-md)] text-sm mb-4 border border-[var(--status-danger)]/20">
+              {error}
+            </div>
+          )}
+
           <button 
             type="submit" 
-            className="w-full bg-[var(--accent)] text-[var(--text-on-accent)] hover:bg-[var(--accent-glow)] transition-colors rounded-[var(--radius-md)] py-3 px-4 font-medium text-sm shadow-[var(--shadow-sm)] uppercase tracking-wider mt-2 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg-surface)]"
+            disabled={login.isPending}
+            className="w-full bg-[var(--accent)] text-[var(--text-on-accent)] hover:bg-[var(--accent-glow)] transition-colors rounded-[var(--radius-md)] py-3 px-4 font-medium text-sm shadow-[var(--shadow-sm)] tracking-wider mt-2 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Sign In
+            {login.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'SIGN IN'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <button onClick={() => router.push('/forgot-password')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm transition-colors">
+        <div className="mt-6 text-center text-sm">
+          <button onClick={() => router.push('/forgot-password')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mr-4">
             Forgot password?
+          </button>
+          <span className="text-[var(--border)] mr-4">|</span>
+          <button onClick={() => router.push('/signup')} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+            Sign up
           </button>
         </div>
       </div>

@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: coreinventory-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: corepassword
+      POSTGRES_DB: coreinventory
+    ports:
+      - "15432:5432"
+    volumes:
+      - ims_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d coreinventory"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: coreinventory-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ims_redisdata:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  ims_pgdata:
+  ims_redisdata:

@@ -12,9 +12,17 @@ interface DataTableProps<T> {
   keyExtractor: (row: T) => string;
   onRowClick?: (row: T) => void;
   emptyMessage?: string;
+  emptyComponent?: React.ReactNode;
 }
 
-export default function DataTable<T>({ data, columns, keyExtractor, onRowClick, emptyMessage = "No items found." }: DataTableProps<T>) {
+export default function DataTable<T>({ 
+  data, 
+  columns, 
+  keyExtractor, 
+  onRowClick, 
+  emptyMessage = "No items found.",
+  emptyComponent
+}: DataTableProps<T>) {
   return (
     <div className="w-full overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] mt-4">
       <table className="w-full text-left border-collapse">
@@ -34,7 +42,7 @@ export default function DataTable<T>({ data, columns, keyExtractor, onRowClick, 
           {data.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="py-12 px-4 text-center text-[var(--text-muted)] text-sm">
-                {emptyMessage}
+                {emptyComponent || emptyMessage}
               </td>
             </tr>
           ) : (

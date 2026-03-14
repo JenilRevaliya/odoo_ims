@@ -2,18 +2,28 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Hexagon, Eye, EyeOff } from 'lucide-react';
+import { Hexagon, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const { resetPassword } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleReset = (e: React.FormEvent) => {
+  const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push('/login');
+    setError(null);
+    try {
+      await resetPassword.mutateAsync({ email, otp, new_password: newPassword });
+      router.push('/login');
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setError((err as any)?.response?.data?.error?.message || 'Failed to reset password');
+    }
   };
 
   return (
@@ -70,11 +80,18 @@ export default function ResetPasswordPage() {
             </button>
           </div>
 
+          {error && (
+            <div className="bg-[var(--status-danger)]/10 text-[var(--status-danger)] px-4 py-3 rounded-[var(--radius-md)] text-sm mb-4 border border-[var(--status-danger)]/20">
+              {error}
+            </div>
+          )}
+
           <button 
             type="submit" 
-            className="w-full bg-[var(--accent)] text-[var(--text-on-accent)] hover:bg-[var(--accent-glow)] transition-colors rounded-[var(--radius-md)] py-3 px-4 font-medium text-sm shadow-[var(--shadow-sm)] uppercase tracking-wider mt-4 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg-surface)]"
+            disabled={resetPassword.isPending}
+            className="w-full bg-[var(--accent)] text-[var(--text-on-accent)] hover:bg-[var(--accent-glow)] transition-colors rounded-[var(--radius-md)] py-3 px-4 font-medium text-sm shadow-[var(--shadow-sm)] tracking-wider mt-4 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Reset Password
+            {resetPassword.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'RESET PASSWORD'}
           </button>
         </form>
       </div>
