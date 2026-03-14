@@ -42,6 +42,18 @@ app.get('/health', (req: Request, res: Response) => {
 import authRoutes from './modules/auth/auth.routes';
 app.use('/v1/auth', authRoutes);
 
+// Products Routes
+import productsRoutes from './modules/products/products.routes';
+app.use('/v1/products', productsRoutes);
+
+// Warehouses Routes
+import warehousesRoutes from './modules/warehouses/warehouses.routes';
+app.use('/v1/warehouses', warehousesRoutes);
+
+// Dashboard Routes
+import dashboardRoutes from './modules/dashboard/dashboard.routes';
+app.use('/v1/dashboard', dashboardRoutes);
+
 // Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   logger.error(err.stack);
