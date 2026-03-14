@@ -54,6 +54,18 @@ app.use('/v1/warehouses', warehousesRoutes);
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 app.use('/v1/dashboard', dashboardRoutes);
 
+// Operations Routes
+import operationsRoutes from './modules/operations/operations.routes';
+app.use('/v1/operations', operationsRoutes);
+
+// Stock Ledger Routes
+import stockLedgerRoutes from './modules/stock-ledger/stock-ledger.routes';
+app.use('/v1/stock-ledger', stockLedgerRoutes);
+
+// Profile Routes
+import profileRoutes from './modules/profile/profile.routes';
+app.use('/v1/profile', profileRoutes);
+
 // Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   logger.error(err.stack);
