@@ -5,15 +5,15 @@ services:
     image: postgres:15-alpine
     container_name: coreinventory-db
     environment:
-      POSTGRES_USER: ${DB_USER:-core}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-corepassword}
-      POSTGRES_DB: ${DB_NAME:-coreinventory}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: corepassword
+      POSTGRES_DB: coreinventory
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ims_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-core} -d ${DB_NAME:-coreinventory}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d coreinventory"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redisdata:/data
+      - ims_redisdata:/data
     command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -33,5 +33,5 @@ services:
       retries: 5
 
 volumes:
-  pgdata:
-  redisdata:
+  ims_pgdata:
+  ims_redisdata:

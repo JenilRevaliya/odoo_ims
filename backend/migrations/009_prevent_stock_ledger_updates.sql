@@ -7,4 +7,4 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER stock_ledger_prevent_updates_deletes
 BEFORE UPDATE OR DELETE ON stock_ledger
-FOR EACH ROW EXECUTE FUNCTION prevent_stock_ledger_updates();
+FOR EACH STATEMENT EXECUTE FUNCTION prevent_stock_ledger_updates();
