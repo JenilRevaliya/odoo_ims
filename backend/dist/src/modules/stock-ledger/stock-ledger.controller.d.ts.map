@@ -1,0 +1,1 @@
+{"version":3,"file":"stock-ledger.controller.d.ts","sourceRoot":"","sources":["../../../../src/modules/stock-ledger/stock-ledger.controller.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG5C,qBAAa,qBAAqB;WACnB,IAAI,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;CAiB9C"}
